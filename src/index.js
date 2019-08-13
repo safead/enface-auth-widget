@@ -154,7 +154,7 @@ EnfaceAuthWidget.prototype.readMessage = function ( message ) {
         this.cancel();
         break;
       case constants.COMMAND_STATUS:
-        this.onChangeState( data.isActive );
+        this.onChangeState( data.isActive, !!data.check );
         this.cancel();
         break;
       case constants.COMMAND_AUTH:

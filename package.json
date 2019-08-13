@@ -1,6 +1,6 @@
 {
   "name": "enface-auth-widget",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Enface biometric authorization (browser widget)",
 	"module": "src/index.js",
   "author": "Enface LTD",
