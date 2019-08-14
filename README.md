@@ -38,25 +38,25 @@ const { EnfaceAuthWidget } = require("enface-auth-widget");
 ```js
 new EnfaceAuthWidget({
 
-	url: <string>,
-	buttonHolderId: <string>
-	debug: <boolean> // debug logs
+  url: <string>,
+  buttonHolderId: <string>
+  debug: <boolean> // debug logs
 
-	onUserAuthInfo() {
-		// get user's session token, session id, cookie etc.
-	},
+  onUserAuthInfo() {
+    // get user's session token, session id, cookie etc.
+  },
 
-	onChangeState(isActive, isInitialCheck) {
-		// status of biometric signin for current user.
-	},
+  onChangeState(isActive, isInitialCheck) {
+    // status of biometric signin for current user.
+  },
 
-	onAuthorized(token) {
-		// user succesfully authorized
-	},
+  onAuthorized(token) {
+    // user succesfully authorized
+  },
 
-	onFailed() {
-		//user authorization failed
-	},
+  onFailed() {
+    // user authorization failed
+  },
 
 });
  ```
@@ -68,11 +68,11 @@ Full [EnfaceAuth library](https://github.com/safead/enface-auth-node "EnfaceAuth
 
 `buttonHolderId: <string>`
 
-Upon creation Enface Widget will look for the element with corresponding "id" on the page and attach "onClick" handler with biometric actions. If "onUserAuthInfo" will return any data (user is currently logged in) - the enable/disable actions will be performed, authorization chain will be started instead.
+Upon creation Enface Widget will look for the element with corresponding "id" on the page and attach "onClick" handler with biometric actions. If "onUserAuthInfo" callback returns any data (user is currently logged in) - the enable/disable actions will be performed, authorization chain will be started instead.
 
 `onUserAuthInfo(): <string>`
 
-Return current user authorization data (token, session id, cookie etc.) if any. The returned value will be processed in "onUserValidate" callback of [EnfaceAuth library](https://github.com/safead/enface-auth-node "EnfaceAuth library") and must definetly identify the user. If current user is guest, return an empty string, null of nothing at all.
+Return current user authorization data (token, session id, cookie etc.) if any. The returned value will be processed in "onUserValidate" callback of [EnfaceAuth library](https://github.com/safead/enface-auth-node "EnfaceAuth library") and must definetly identify the user. If current user is guest, return an empty string, null or nothing at all.
 
 `onChangeState(isActive, isInitialCheck)`
 
@@ -86,68 +86,68 @@ This function will be called on successfull user authorization. "onUserTokenByBi
 
 This function will be called on biometric authorization failure. Show any messages or dialogs to notify the user about the failure.
 
-###Here is how EnfaceAuthWidget is integrated at our own React frontend.
+### Here is how EnfaceAuthWidget is integrated at our own React frontend.
 
 We are widely using hooks in the frontend application, so we put "useAuthWidget" at signin page and in the settings component, where the switcher "Turn biometric signin ON/OF" is placed.
 ```js
 export const SignInPage = () => {
 
-	useAuthWidget();
+  useAuthWidget();
 
-	/* the rest of SignInPage component's code*/
+  /* the rest of SignInPage component's code*/
 }
 ```
 ```js
 export const TopBar = () => {
 
-	useAuthWidget();
+  useAuthWidget();
 
-	/* the rest of TopBar component's code*/
+  /* the rest of TopBar component's code*/
 }
 ```
 Here is full "useAuthWidget" hook code:
 ```js
 const useAuthWidget = () => {
 
-	const { history } = useReactRouter();
+  const { history } = useReactRouter();
 
-	useEffect(() => {
-		new EnfaceAuthWidget({
-			url: 'https://enface-api-server.herokuapp.com',
-			buttonHolderId: 'enfaceWidgetButtonHolder',
+  useEffect(() => {
+    new EnfaceAuthWidget({
+      url: 'https://enface-api-server.herokuapp.com',
+      buttonHolderId: 'enfaceWidgetButtonHolder',
 
-			onUserAuthInfo() {
-				// return current session token
-				return sessionStorage.getItem('token');
-			},
+      onUserAuthInfo() {
+        // return current session token
+        return sessionStorage.getItem('token');
+      },
 
-			onChangeState(isActive, isInitialCheck) {
-				// if "isInitialCheck" is true - this is just initialization check and no messages should be shown to the user
-				const statusElem = document.getElementById('enfaceWidgetButtonHolder');
-				// changing interface elements regarding the biometric state
-				statusElem && (statusElem.innerHTML = `${isActive ? 'Disable' : 'Enable'} biometric sign in`);
-				isInitialCheck || dialog.show({
-					caption: 'Operation succeed',
-					message: `Your biometric signin is now ${isActive ? 'enabled' : 'disabled'}`,
-					buttons: ['I got it'],
-				});
-			},
+      onChangeState(isActive, isInitialCheck) {
+        // if "isInitialCheck" is true - this is just initialization check and no messages should be shown to the user
+        const statusElem = document.getElementById('enfaceWidgetButtonHolder');
+        // changing interface elements regarding the biometric state
+        statusElem && (statusElem.innerHTML = `${isActive ? 'Disable' : 'Enable'} biometric sign in`);
+        isInitialCheck || dialog.show({
+          caption: 'Operation succeed',
+          message: `Your biometric signin is now ${isActive ? 'enabled' : 'disabled'}`,
+          buttons: ['I got it'],
+        });
+      },
 
-			onAuthorized(token) {
-				// use the "token" variable to initialize authorized session
-				sessionStorage.setItem('token', token);
-				history.push(paths.PATH_ROOT);
-			},
+      onAuthorized(token) {
+        // use the "token" variable to initialize authorized session
+        sessionStorage.setItem('token', token);
+        history.push(paths.PATH_ROOT);
+      },
 
-			onFailed() {
-				dialog.show({
-					caption: 'Biometric signin failed',
-					message: "We don't know you or biometric signin is turned off in your profile settings. Please sign in using email & password and enable biometric authorization in the members are.",
-					buttons: ['I got it'],
-				});
-			},
+      onFailed() {
+        dialog.show({
+          caption: 'Biometric signin failed',
+          message: "We don't know you or biometric signin is turned off in your profile settings. Please sign in using email & password and enable biometric authorization in the members are.",
+          buttons: ['I got it'],
+        });
+      },
 
-		});
-	}, []);
+    });
+  }, []);
 };
 ```
