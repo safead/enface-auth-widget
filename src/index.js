@@ -3,7 +3,9 @@ import * as templates from './templates';
 import { QrCodeImage } from './qrcode';
 
 export const EnfaceAuthWidget = function ( {
+  debug,
   url,
+  buttonHolderId = constants.BUTTON_HOLDER_ID,
   onUserAuthInfo,
   onChangeState,
   onAuthorized,
@@ -21,8 +23,9 @@ export const EnfaceAuthWidget = function ( {
     console.error( 'Please provide an "onAuthorized" callback to process user authorization data on the client side' );
     return;
   }
-  this._DEBUG = false;
+  this._DEBUG = !!debug;
   this.url = url;
+  this.buttonHolderId = buttonHolderId;
   this.isHttp = this.url.startsWith( 'http' );
   this.url.endsWith( '/' ) && ( this.url = this.url.substring( 0, this.url.length - 1 ) );
   this.isHttp && ( this.url += constants.HTTP_URI );
@@ -220,9 +223,9 @@ EnfaceAuthWidget.prototype.checkEnvironment = function () {
     console.error( 'This browser do not supports AbortController. Enface authentification will not work correctly.' );
     return false;
   }
-  const buttonHolder = document.getElementById( constants.BUTTON_HOLDER_ID );
+  const buttonHolder = document.getElementById( this.buttonHolderId );
   if ( !buttonHolder ) {
-    console.error( `[Enface auth] Element with id="${constants.BUTTON_HOLDER_ID}" not found on the page` );
+    console.error( `[Enface auth] Element with id="${this.buttonHolderId}" not found on the page` );
     return false;
   }
   if ( buttonHolder.innerHTML ) {
